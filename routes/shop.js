@@ -9,6 +9,8 @@ router.get('/products', shopCtrl.getProducts);
 
 router.get('/cart', shopCtrl.getCart);
 
+router.get('/orders', shopCtrl.getOrders);
+
 router.get('/checkout', shopCtrl.getCheckout);
 
 

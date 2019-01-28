@@ -1,1 +1,8 @@
-[{"title":"hi"},{"title":"ko"},{"title":"hola"},{"title":"bueno bueno bueno"},{"title":"holia"},{"title":"hahaha"}]
+[
+  {
+    "title": "A Game of Thrones",
+    "imageUrl": "https://cdn.waterstones.com/bookjackets/large/9780/0074/9780007448036.jpg",
+    "description": "Colossal, staggering... Martin captures all the intoxicating complexity of the Wars of the Roses or Imperial Rome in his imaginary world ... one of the greats of fantasy literature",
+    "price": "10"
+  }
+]
