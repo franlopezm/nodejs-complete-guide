@@ -1,8 +1,1 @@
-[
-  {
-    "title": "A Game of Thrones",
-    "imageUrl": "https://cdn.waterstones.com/bookjackets/large/9780/0074/9780007448036.jpg",
-    "description": "Colossal, staggering... Martin captures all the intoxicating complexity of the Wars of the Roses or Imperial Rome in his imaginary world ... one of the greats of fantasy literature",
-    "price": "10"
-  }
-]
+[{"id":"123423","title":"A Game of Thrones","imageUrl":"https://cdn.waterstones.com/bookjackets/large/9780/0074/9780007448036.jpg","description":"Colossal, staggering... Martin captures all the intoxicating complexity of the Wars of the Roses or Imperial Rome in his imaginary world ... one of the greats of fantasy literature","price":"10"},{"id":"0.47297967264437957","title":"Harry Potter and the Philosopher's Stone","imageUrl":"https://images-na.ssl-images-amazon.com/images/I/51DF6ZR8G7L._SX329_BO1,204,203,200_.jpg","description":"A winner of England's National Book Award, the acclaimed debut novel tells the outrageously funny, fantastic adventure story of Harry Potter, who escapes a hideous foster home thanks to a scholarship to The Hogwarts School for Witchcraft and Wizardry.","price":"14"}]
