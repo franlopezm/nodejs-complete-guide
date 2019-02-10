@@ -25,6 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   User.findByPk(1)
     .then(user => {
+      // return a sequelize object
       req.user = user;
 
       next();
