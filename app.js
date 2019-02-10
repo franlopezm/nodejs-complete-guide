@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { getPathView } = require('./utils/path');
-const db = require('./utils/database');
+const sequelize = require('./utils/database');
 
 const { get404 } = require('./controllers/error');
 const adminRoutes = require('./routes/admin').router;
@@ -24,6 +24,12 @@ app.use(shopRoutes);
 
 app.use(get404);
 
-
-// Listen
-app.listen(3000, () => console.log('Listening in PORT 3000'));
+//Init database models, create tables
+sequelize
+  .sync()
+  .then(result => {
+    // console.log(result);
+    // Listen
+    app.listen(3000, () => console.log('Listening in PORT 3000'));
+  })
+  .catch(error => console.log('Init database error:', error));
