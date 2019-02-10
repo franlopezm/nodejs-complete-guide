@@ -26,16 +26,16 @@ exports.getEditProduct = (req, res, next) => {
 
   if (!editMode) return res.redirect('/');
 
-  Product
-    .findByPk(productId)
-    .then(product => {
-      if (!product) return res.redirect('/');
+  req.user
+    .getProducts({ where: { id: productId } })
+    .then(products => {
+      if (!products) return res.redirect('/');
 
       res.render('admin/edit-product', {
         pageTitle: 'Edit product',
         path: '/admin/edit-product',
         editing: editMode,
-        product
+        product: products[0]
       });
     })
     .catch(error => console.log(error));
@@ -58,8 +58,7 @@ exports.postEditProduct = (req, res) => {
 
 
 exports.getProducts = (req, res, next) => {
-  Product
-    .findAll()
+  req.user.getProducts()
     .then(products => {
       res.render('admin/products', {
         prods: products,
