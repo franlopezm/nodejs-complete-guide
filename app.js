@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { getPathView } = require('./utils/path');
+
 const sequelize = require('./utils/database');
+const Product = require('./models/products');
+const User = require('./models/user');
 
 const { get404 } = require('./controllers/error');
 const adminRoutes = require('./routes/admin').router;
@@ -18,17 +21,43 @@ app.set('views', 'views');
 app.use(express.static(getPathView('', 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Get user to available in applications
+app.use((req, res, next) => {
+  User.findByPk(1)
+    .then(user => {
+      req.user = user;
+
+      next();
+    })
+    .catch(error => console.log(error));
+})
+
 // Routes
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(get404);
 
-//Init database models, create tables
+// Relations between tables
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Product);
+
+//Init database models, create tables and relations
 sequelize
-  .sync()
+  .sync(/* { force: true } */)
   .then(result => {
+    return User.findByPk(1);
     // console.log(result);
+  })
+  .then(user => {
+    if (!user) {
+      return User.create({ name: 'Fran', email: 'test@test.com' });
+    }
+
+    return user;
+  })
+  .then(user => {
+    //console.log('TCL: user', user)
     // Listen
     app.listen(3000, () => console.log('Listening in PORT 3000'));
   })
