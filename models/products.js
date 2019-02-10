@@ -1,21 +1,9 @@
-const fs = require('fs');
-const { getPathView } = require('../utils/path');
+const db = require('../utils/database');
 const Cart = require('./cart');
-
-const pathData = getPathView('products.json', 'data');
-
-const getProductsFromFile = cb => {
-  fs.readFile(pathData, (error, file) => {
-    if (error) return cb([]);
-
-    cb(JSON.parse(file));
-  });
-}
 
 
 module.exports = class Product {
-  constructor(id, title, imageUrl, description, price) {
-    this.id = id;
+  constructor(title, imageUrl, description, price) {
     this.title = title;
     this.imageUrl = imageUrl;
     this.description = description;
@@ -23,51 +11,21 @@ module.exports = class Product {
   }
 
   save() {
-    getProductsFromFile(products => {
-      const newProducts = [...products];
-
-      if (this.id) {
-        // Update
-        const index = products.findIndex(p => p.id === this.id);
-
-        newProducts[index] = this;
-      } else {
-        // Add new
-        this.id = Math.random().toString();
-
-        newProducts.push(this);
-      }
-
-      fs.writeFile(pathData, JSON.stringify(newProducts), (error) => {
-        console.log('TCL: Product -> save -> error', error)
-      });
-    });
+    return db.execute(
+      'INSERT INTO products (title, price, imageUrl, description) VALUES (?,?,?,?)',
+      [this.title, this.price, this.imageUrl, this.description]
+    );
   }
 
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
+  static fetchAll() {
+    return db.execute('SELECT * FROM products');
   }
 
-  static findById(id, cb) {
-    getProductsFromFile(products => {
-      const product = products.find(p => p.id === id);
-
-      cb(product);
-    });
+  static findById(id) {
+    return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
   }
 
   static deleteById(id) {
-    getProductsFromFile(products => {
-      const product = products.find(p => p.id === id);
-      const updateProducts = products.filter(p => p.id !== id);
 
-      fs.writeFile(pathData, JSON.stringify(updateProducts), (error) => {
-        if (!error) {
-          Cart.deleteProduct(id, product.price);
-        } else {
-          console.log('TCL: Product -> save -> error', error)
-        }
-      });
-    });
   }
 }

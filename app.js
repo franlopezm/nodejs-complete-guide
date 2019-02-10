@@ -7,8 +7,6 @@ const { get404 } = require('./controllers/error');
 const adminRoutes = require('./routes/admin').router;
 const shopRoutes = require('./routes/shop');
 
-db.execute('SELECT * FROM products');
-
 const app = express();
 // Remove Headers by security
 app.disable('x-powered-by');
