@@ -5,6 +5,8 @@ const { getPathView } = require('./utils/path');
 const sequelize = require('./utils/database');
 const Product = require('./models/products');
 const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
 
 const { get404 } = require('./controllers/error');
 const adminRoutes = require('./routes/admin').router;
@@ -42,10 +44,15 @@ app.use(get404);
 // Relations between tables
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+
 
 //Init database models, create tables and relations
 sequelize
-  .sync(/* { force: true } */)
+  .sync({ force: true })
   .then(result => {
     return User.findByPk(1);
     // console.log(result);
