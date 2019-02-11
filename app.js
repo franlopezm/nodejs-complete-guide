@@ -7,6 +7,8 @@ const Product = require('./models/products');
 const User = require('./models/user');
 const Cart = require('./models/cart');
 const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 
 const { get404 } = require('./controllers/error');
 const adminRoutes = require('./routes/admin').router;
@@ -48,6 +50,9 @@ User.hasOne(Cart);
 Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
 
 
 //Init database models, create tables and relations
