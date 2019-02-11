@@ -47,48 +47,64 @@ exports.getProduct = (req, res, next) => {
 
 
 exports.getCart = (req, res, next) => {
-  Cart.getProducts(cart => {
-    Product.fetchAll(products => {
-      const cartProducts = [];
-
-      cart.products.forEach(cartProduct => {
-        const product = products.find(p => p.id === cartProduct.id);
-
-        if (product) {
-          cartProducts.push({ product, qty: cartProduct.qty });
-        }
-      });
-
+  req.user.getCart()
+    .then(cart => cart.getProducts())
+    .then(products => {
       res.render('shop/cart', {
         pageTitle: 'Your Cart',
         path: '/cart',
-        products: cartProducts,
-        totalPrice: cart.totalPrice
+        products: products,
+        //totalPrice: cart.totalPrice
       });
     })
-  })
+    .catch(error => console.log(error));
 }
 
 
 exports.postCart = (req, res, next) => {
   const { productId } = req.body;
 
-  Product.findById(productId, product => {
-    Cart.addProduct(productId, product.price);
+  let fetchedCart;
+  let newQuantity = 1;
 
-    res.redirect('/cart');
-  });
+  req.user.getCart()
+    .then(cart => {
+      fetchedCart = cart;
+      return cart.getProducts({ where: { id: productId } })
+    })
+    .then(([product]) => {
+      if (product) {
+        const oldQuantity = product.cartItem.quantity;
+        newQuantity = oldQuantity + 1;
+        return product;
+      }
+
+      return Product.findByPk(productId);
+    })
+    .then(product => {
+      return fetchedCart
+        .addProduct(product, { through: { quantity: newQuantity } });
+    })
+    .then(() => {
+      res.redirect('/cart');
+    })
+    .catch(error => console.log(error));
 }
 
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const { productId } = req.body;
 
-  Product.findById(productId, product => {
-    Cart.deleteProduct(productId, product.price);
-
-    res.redirect('/cart');
-  });
+  req.user
+    .getCart()
+    .then(cart => {
+      return cart.getProducts({ where: { id: productId } });
+    })
+    .then(([product]) => product.cartItem.destroy())
+    .then(() => {
+      res.redirect('/cart');
+    })
+    .catch(error => console.log(error));
 }
 
 

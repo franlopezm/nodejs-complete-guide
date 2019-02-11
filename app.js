@@ -52,7 +52,8 @@ Product.belongsToMany(Cart, { through: CartItem });
 
 //Init database models, create tables and relations
 sequelize
-  .sync({ force: true })
+  //.sync({ force: true })
+  .sync()
   .then(result => {
     return User.findByPk(1);
     // console.log(result);
@@ -67,6 +68,9 @@ sequelize
   .then(user => {
     //console.log('TCL: user', user)
     // Listen
+    return user.createCart();
+  })
+  .then(cart => {
     app.listen(3000, () => console.log('Listening in PORT 3000'));
   })
   .catch(error => console.log('Init database error:', error));
