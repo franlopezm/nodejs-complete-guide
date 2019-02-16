@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Get user to available in applications
 app.use((req, res, next) => {
   User
-    .findOne('5c68397bca46fa33a1fb50ba')
+    .findById('5c68397bca46fa33a1fb50ba')
     .then(user => {
       req.user = user;
 
