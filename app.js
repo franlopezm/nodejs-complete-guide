@@ -43,7 +43,7 @@ app.use(errorCtrl.get404);
 
 // Connect to ddbb and run app
 mongoose
-  .connect('mongodb://localhost:27017', { dbName: 'node-complete', autoIndex: false, useNewUrlParser: true })
+  .connect('mongodb://localhost:27017', { dbName: 'node-complete', autoIndex: false, useNewUrlParser: true, useFindAndModify: false })
   .then(() => {
     app.listen(3000, () => console.log('Listening in PORT 3000'));
   })

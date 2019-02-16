@@ -29,16 +29,16 @@ exports.getEditProduct = (req, res, next) => {
 
   if (!editMode) return res.redirect('/');
 
-  req.user
-    .getProducts({ where: { id: productId } })
-    .then(products => {
-      if (!products) return res.redirect('/');
+  Product
+    .findById(productId)
+    .then(product => {
+      if (!product) return res.redirect('/');
 
       res.render('admin/edit-product', {
         pageTitle: 'Edit product',
         path: '/admin/edit-product',
         editing: editMode,
-        product: products[0]
+        product: product
       });
     })
     .catch(error => console.log(error));
@@ -49,10 +49,7 @@ exports.postEditProduct = (req, res) => {
   const { body: { title, description, imageUrl, price, productId } } = req;
 
   Product
-    .update(
-      { title, description, price, imageUrl },
-      { where: { id: productId } }
-    )
+    .findOneAndUpdate(productId, { $set: { title, description, imageUrl, price } })
     .then(() => {
       res.redirect('/admin/products');
     })
@@ -61,7 +58,8 @@ exports.postEditProduct = (req, res) => {
 
 
 exports.getProducts = (req, res, next) => {
-  req.user.getProducts()
+  Product
+    .find()
     .then(products => {
       res.render('admin/products', {
         prods: products,
@@ -77,7 +75,7 @@ exports.postDeleteProduct = (req, res) => {
   const { productId } = req.body;
 
   Product
-    .destroy({ where: { id: productId } })
+    .findOneAndDelete(productId)
     .then(() => {
       res.redirect('/admin/products');
     })
