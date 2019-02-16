@@ -105,6 +105,7 @@ exports.postOrder = (req, res, next) => {
 
       return order.save();
     })
+    .then(() => req.user.clearCart())
     .then(() => {
       res.redirect('/orders');
     })
@@ -112,8 +113,8 @@ exports.postOrder = (req, res, next) => {
 }
 
 exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders({ include: ['products'] })
+  Order
+    .find({ "user.userId": req.user })
     .then(orders => {
       res.render('shop/orders', {
         pageTitle: 'Your Orders',
