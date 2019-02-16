@@ -9,7 +9,7 @@ const User = require('./models/user');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const { get404 } = require('./controllers/error');
+const errorCtrl = require('./controllers/error');
 
 const app = express();
 // Remove Headers by security
@@ -23,21 +23,21 @@ app.use(express.static(getPathView('', 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Get user to available in applications
-app.use((req, res, next) => {
-  /* User.findByPk(1)
+/* app.use((req, res, next) => {
+  User.findByPk(1)
     .then(user => {
       // return a sequelize object
       req.user = user;
 
       next();
     })
-    .catch(error => console.log(error)); */
-})
+    .catch(error => console.log(error));
+}); */
 
 // Routes
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use(get404);
+app.use(errorCtrl.get404);
 
 
 
