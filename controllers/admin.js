@@ -30,7 +30,7 @@ exports.getEditProduct = (req, res, next) => {
   if (!editMode) return res.redirect('/');
 
   Product
-    .findById(productId)
+    .findOne({ _id: productId, userId: req.user })
     .then(product => {
       if (!product) return res.redirect('/');
 
@@ -49,7 +49,7 @@ exports.postEditProduct = (req, res) => {
   const { body: { title, description, imageUrl, price, productId } } = req;
 
   Product
-    .findOneAndUpdate(productId, { $set: { title, description, imageUrl, price } })
+    .findOneAndUpdate({ _id: productId, userId: req.user }, { $set: { title, description, imageUrl, price } })
     .then(() => {
       res.redirect('/admin/products');
     })
@@ -59,7 +59,7 @@ exports.postEditProduct = (req, res) => {
 
 exports.getProducts = (req, res, next) => {
   Product
-    .find()
+    .find({ userId: req.user })
     .then(products => {
       res.render('admin/products', {
         prods: products,
@@ -75,7 +75,7 @@ exports.postDeleteProduct = (req, res) => {
   const { productId } = req.body;
 
   Product
-    .findOneAndDelete(productId)
+    .findOneAndDelete({ _id: productId, userId: req.user })
     .then(() => {
       res.redirect('/admin/products');
     })
