@@ -37,8 +37,6 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(errorCtrl.get404);
 
-
-
 // Connect to ddbb and run app
 mongoose
   .connect('mongodb://localhost:27017', { dbName: 'node-complete', autoIndex: false, useNewUrlParser: true, useFindAndModify: false })
