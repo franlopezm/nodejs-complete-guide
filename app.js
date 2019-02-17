@@ -1,7 +1,12 @@
-const mongoose = require('mongoose');
-const express = require('express');
-const bodyParser = require('body-parser');
+const MONGODB_URL = 'mongodb://localhost:27017/node-complete';
+
 const { getPathView } = require('./utils/path');
+const bodyParser = require('body-parser');
+const express = require('express');
+const mongoose = require('mongoose');
+const session = require('express-session');
+
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const User = require('./models/user');
 
@@ -12,6 +17,9 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
 const app = express();
+// Connect session to mongodb
+const store = new MongoDBStore({ uri: MONGODB_URL, collection: 'sessions' });
+
 // Remove Headers by security
 app.disable('x-powered-by');
 // Set view engine
@@ -22,17 +30,25 @@ app.set('views', 'views');
 app.use(express.static(getPathView('', 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Get user to available in applications
-app.use((req, res, next) => {
-  User
-    .findById('5c68397bca46fa33a1fb50ba')
-    .then(user => {
-      req.user = user;
+// Session middleware configuration
+app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false, store }));
 
-      next();
-    })
-    .catch(error => console.log(error));
-});
+// Get user to available in applications
+/* app.use((req, res, next) => {
+  const { isLoggedIn, userId } = req.session;
+  if (isLoggedIn && userId) {
+    User
+      .findById(userId)
+      .then(user => {
+        req.user = user;
+
+        next();
+      })
+      .catch(error => console.log(error));
+  } else {
+    next();
+  }
+}); */
 
 // Routes
 app.use('/admin', adminRoutes);
@@ -42,7 +58,7 @@ app.use(errorCtrl.get404);
 
 // Connect to ddbb and run app
 mongoose
-  .connect('mongodb://localhost:27017', { dbName: 'node-complete', autoIndex: false, useNewUrlParser: true, useFindAndModify: false })
+  .connect(MONGODB_URL, { autoIndex: false, useNewUrlParser: true, useFindAndModify: false })
   .then(() => {
     User
       .findOne()
