@@ -5,9 +5,11 @@ const { getPathView } = require('./utils/path');
 
 const User = require('./models/user');
 
+const errorCtrl = require('./controllers/error');
+
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const errorCtrl = require('./controllers/error');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 // Remove Headers by security
@@ -35,6 +37,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 app.use(errorCtrl.get404);
 
 // Connect to ddbb and run app
