@@ -35,19 +35,16 @@ app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false, 
 
 // Get user to available in applications
 app.use((req, res, next) => {
-  const { isLoggedIn, user } = req.session;
+  if (!req.session.user) return next();
 
-  if (isLoggedIn && user) {
-    User
-      .findById(user._id)
-      .then(user => {
-        req.user = user;
-        next();
-      })
-      .catch(error => console.log(error));
-  } else {
-    next();
-  }
+  const { user } = req.session;
+  User
+    .findById(user._id)
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(error => console.log(error));
 });
 
 // Routes
