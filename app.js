@@ -34,21 +34,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false, store }));
 
 // Get user to available in applications
-/* app.use((req, res, next) => {
-  const { isLoggedIn, userId } = req.session;
-  if (isLoggedIn && userId) {
+app.use((req, res, next) => {
+  const { isLoggedIn, user } = req.session;
+
+  if (isLoggedIn && user) {
     User
-      .findById(userId)
+      .findById(user._id)
       .then(user => {
         req.user = user;
-
         next();
       })
       .catch(error => console.log(error));
   } else {
     next();
   }
-}); */
+});
 
 // Routes
 app.use('/admin', adminRoutes);
