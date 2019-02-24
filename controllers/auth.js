@@ -2,10 +2,12 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
+  const message = req.flash('error');
+
   res.render('auth/login', {
     pageTitle: 'Login',
     path: '/login',
-    isAuthenticated: false
+    errorMessage: message.length > 0 ? message : undefined
   });
 };
 
@@ -15,12 +17,18 @@ exports.postLogin = (req, res, next) => {
   User
     .findOne({ email })
     .then(user => {
-      if (!user) return res.redirect('/login');
+      if (!user) {
+        req.flash('error', 'Invalid email or password.');
+        return res.redirect('/login');
+      }
 
       bcrypt
         .compare(password, user.password)
         .then(doMatch => {
-          if (!doMatch) return res.redirect('/login');
+          if (!doMatch) {
+            req.flash('error', 'Invalid email or password.');
+            return res.redirect('/login');
+          }
 
           req.session.isLoggedIn = true;
           req.session.user = user;
@@ -30,16 +38,21 @@ exports.postLogin = (req, res, next) => {
             res.redirect('/');
           });
         })
-        .catch(error => res.redirect('/login'));
+        .catch(error => {
+          req.flash('error', 'Invalid email or password.');
+          return res.redirect('/login');
+        });
     })
     .catch(error => console.log('Login error:', error));
 };
 
 exports.getSignup = (req, res, next) => {
+  const message = req.flash('error');
+
   res.render('auth/signup', {
     pageTitle: 'Signup',
     path: '/signup',
-    isAuthenticated: false
+    errorMessage: message.length > 0 ? message : undefined
   });
 };
 
@@ -49,7 +62,10 @@ exports.postSignup = (req, res, next) => {
   User
     .findOne({ email })
     .then(userDoc => {
-      if (userDoc) return res.redirect('/signup');
+      if (userDoc) {
+        req.flash('error', 'Email exists already, please pick a different one.');
+        return res.redirect('/signup');
+      }
 
       return bcrypt
         .hash(password, 12)
@@ -61,7 +77,10 @@ exports.postSignup = (req, res, next) => {
           res.redirect('/login');
         })
     })
-    .catch(error => console.log(error));
+    .catch(error => {
+      req.flash('error', 'Email exists already, please pick a different one.');
+      return res.redirect('/signup');
+    });
 };
 
 exports.postLogout = (req, res, next) => {

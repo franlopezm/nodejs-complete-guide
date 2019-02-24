@@ -6,6 +6,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const csrf = require('csurf');
+const flash = require('connect-flash');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const User = require('./models/user');
@@ -33,6 +34,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Session middleware configuration
 app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false, store }));
 app.use(csrfProtection);
+app.use(flash());
 
 // Get user to available in applications
 app.use((req, res, next) => {
