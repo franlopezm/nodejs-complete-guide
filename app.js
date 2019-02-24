@@ -5,11 +5,10 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
-
+const csrf = require('csurf');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const User = require('./models/user');
-
 const errorCtrl = require('./controllers/error');
 
 const adminRoutes = require('./routes/admin');
@@ -19,6 +18,7 @@ const authRoutes = require('./routes/auth');
 const app = express();
 // Connect session to mongodb
 const store = new MongoDBStore({ uri: MONGODB_URL, collection: 'sessions' });
+const csrfProtection = csrf();
 
 // Remove Headers by security
 app.disable('x-powered-by');
@@ -32,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Session middleware configuration
 app.use(session({ secret: 'my secret', resave: false, saveUninitialized: false, store }));
+app.use(csrfProtection);
 
 // Get user to available in applications
 app.use((req, res, next) => {
@@ -45,6 +46,14 @@ app.use((req, res, next) => {
       next();
     })
     .catch(error => console.log(error));
+});
+
+// Fields set in every render.
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+
+  next();
 });
 
 // Routes
