@@ -57,14 +57,6 @@ app.use(errorCtrl.get404);
 mongoose
   .connect(MONGODB_URL, { autoIndex: false, useNewUrlParser: true, useFindAndModify: false })
   .then(() => {
-    User
-      .findOne()
-      .then(user => {
-        if (!user) {
-          const user = new User({ name: "Fran", email: "fran@test.com", cart: { items: [] } })
-          user.save();
-        }
-        app.listen(3000, () => console.log('Listening in PORT 3000'));
-      })
+    app.listen(3000, () => console.log('Listening in PORT 3000'));
   })
   .catch(error => console.log('Connection ddbb Error::', error));
