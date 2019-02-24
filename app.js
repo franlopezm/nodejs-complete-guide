@@ -1,4 +1,4 @@
-const MONGODB_URL = 'mongodb://localhost:27017/node-complete';
+const MONGODB_URL = process.env.MONGODB_URL;
 
 const { getPathView } = require('./utils/path');
 const bodyParser = require('body-parser');
