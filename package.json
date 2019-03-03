@@ -18,7 +18,8 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "mongoose": "^5.4.15",
+    "express-validator": "^5.3.1",
+    "mongoose": "^5.4.16",
     "nodemailer": "^5.1.1",
     "nodemailer-sendgrid-transport": "^0.2.0"
   },
