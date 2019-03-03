@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const { validationResult } = require('express-validator/check');
 
 const User = require('../models/user');
 
@@ -17,12 +18,25 @@ exports.getLogin = (req, res, next) => {
   res.render('auth/login', {
     pageTitle: 'Login',
     path: '/login',
-    errorMessage: message.length > 0 ? message : undefined
+    errorMessage: message.length > 0 ? message : undefined,
+    oldInput: { email: '', password: '' },
+    validationErrors: []
   });
 };
 
 exports.postLogin = (req, res, next) => {
   const { password, email } = req.body;
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render('auth/login', {
+      pageTitle: 'Login',
+      path: '/login',
+      errorMessage: errors.array()[0].msg,
+      oldInput: { email, password },
+      validationErrors: errors.array()
+    });
+  }
 
   User
     .findOne({ email })
@@ -45,7 +59,7 @@ exports.postLogin = (req, res, next) => {
           req.session.save((error) => {
             if (error) console.log('Create session error', error);
 
-            res.redirect('/');
+            return res.redirect('/');
           });
         })
         .catch(error => {
@@ -62,42 +76,48 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     pageTitle: 'Signup',
     path: '/signup',
-    errorMessage: message.length > 0 ? message : undefined
+    errorMessage: message.length > 0 ? message : undefined,
+    oldInput: {
+      email: '',
+      password: '',
+      confirmPassword: ''
+    },
+    validationErrors: []
   });
 };
 
 exports.postSignup = (req, res, next) => {
   const { email, password, confirmPassword } = req.body;
 
-  User
-    .findOne({ email })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash('error', 'Email exists already, please pick a different one.');
-        return res.redirect('/signup');
-      }
-
-      return bcrypt
-        .hash(password, 12)
-        .then(hash => {
-          const user = new User({ email, password: hash, cart: { items: [] } });
-          return user.save();
-        })
-        .then(result => {
-          transporter.sendMail({
-            to: email,
-            from: "shop@prueba.com",
-            subject: "Signup success",
-            html: "<h1>You successfully signed up!</h1>"
-          }).catch(error => console.log('Send mail Error', error));
-
-          res.redirect('/login');
-        })
-    })
-    .catch(error => {
-      req.flash('error', 'Email exists already, please pick a different one.');
-      return res.redirect('/signup');
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render('auth/signup', {
+      pageTitle: 'Signup',
+      path: '/signup',
+      errorMessage: errors.array()[0].msg,
+      oldInput: { email, password, confirmPassword },
+      validationErrors: errors.array()
     });
+  }
+
+  bcrypt
+    .hash(password, 12)
+    .then(hash => {
+      const user = new User({ email, password: hash, cart: { items: [] } });
+      return user.save();
+    })
+    .then(result => {
+      transporter
+        .sendMail({
+          to: email,
+          from: "shop@prueba.com",
+          subject: "Signup success",
+          html: "<h1>You successfully signed up!</h1>"
+        })
+        .catch(error => console.log('Send mail Error', error));
+
+      res.redirect('/login');
+    })
 };
 
 exports.postLogout = (req, res, next) => {
