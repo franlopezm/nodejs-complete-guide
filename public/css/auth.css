@@ -4,3 +4,12 @@
   margin: auto;
   display: block;
 }
+
+.reset-password {
+  font-size: 12px;
+  text-align: right;
+}
+
+.reset-password a {
+  border-color: white;
+}
