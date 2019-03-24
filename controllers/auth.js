@@ -42,16 +42,26 @@ exports.postLogin = (req, res, next) => {
     .findOne({ email })
     .then(user => {
       if (!user) {
-        req.flash('error', 'Invalid email or password.');
-        return res.redirect('/login');
+        return res.status(422).render('auth/login', {
+          pageTitle: 'Login',
+          path: '/login',
+          errorMessage: 'Invalid email or password.',
+          oldInput: { email, password },
+          validationErrors: []
+        });
       }
 
       bcrypt
         .compare(password, user.password)
         .then(doMatch => {
           if (!doMatch) {
-            req.flash('error', 'Invalid email or password.');
-            return res.redirect('/login');
+            return res.status(422).render('auth/login', {
+              pageTitle: 'Login',
+              path: '/login',
+              errorMessage: 'Invalid email or password.',
+              oldInput: { email, password },
+              validationErrors: []
+            });
           }
 
           req.session.isLoggedIn = true;
@@ -63,8 +73,13 @@ exports.postLogin = (req, res, next) => {
           });
         })
         .catch(error => {
-          req.flash('error', 'Invalid email or password.');
-          return res.redirect('/login');
+          return res.status(422).render('auth/login', {
+            pageTitle: 'Login',
+            path: '/login',
+            errorMessage: 'Invalid email or password.',
+            oldInput: { email, password },
+            validationErrors: []
+          });
         });
     })
     .catch(error => console.log('Login error:', error));
